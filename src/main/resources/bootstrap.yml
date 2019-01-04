@@ -47,7 +47,7 @@ spring:
             token-uri: http://auth-responsible-oribi.cfapps.io/auth/oauth/token
             user-info-uri: http://auth-responsible-oribi.cfapps.io/auth/user
             user-name-attribute: username
-            jwk-set-uri: /auth/.well-known/jwks.json
+            jwk-set-uri: http://auth-responsible-oribi.cfapps.io/auth/.well-known/jwks.json
 eureka:
   instance:
     instanceId: ${spring.application.name}:${random.value}
