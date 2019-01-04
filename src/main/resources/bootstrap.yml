@@ -21,6 +21,8 @@ spring:
         uri: lb:http://auth
         predicates:
         - Path=/auth/**
+        filters:
+        - SaveSession
       - id: tube
         uri: lb:http://tube
         predicates:
@@ -42,11 +44,11 @@ spring:
             scope: read
         provider:
           auth:
-            authorization-uri: http://auth-responsible-oribi.cfapps.io/auth/oauth/authorize
-            token-uri: http://auth-responsible-oribi.cfapps.io/auth/oauth/token
-            user-info-uri: http://auth-responsible-oribi.cfapps.io/auth/user
+            authorization-uri: http://localhost:8080/auth/oauth/authorize
+            token-uri: http://localhost:8080/auth/oauth/token
+            user-info-uri: http://localhost:8080/auth/user
             user-name-attribute: username
-            jwk-set-uri: http://auth-responsible-oribi.cfapps.io/auth/.well-known/jwks.json
+            jwk-set-uri: http://localhost:8080/auth/.well-known/jwks.json
 eureka:
   instance:
     instanceId: ${spring.application.name}:${random.value}
