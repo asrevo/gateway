@@ -16,6 +16,13 @@ spring:
     config:
       uri: http://revo:revo@${org.revo.env.config.externalurl:${org.revo.env.config.internalurl}}
     gateway:
+      x-forwarded:
+        enabled: true
+        for-enabled: true
+        proto-enabled: true
+        host-append: false
+        port-append: false
+        proto-append: false
       routes:
       - id: auth
         uri: lb://auth
