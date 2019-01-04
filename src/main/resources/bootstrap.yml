@@ -44,11 +44,11 @@ spring:
             scope: read
         provider:
           auth:
-            authorization-uri: http://localhost:8080/auth/oauth/authorize
-            token-uri: http://localhost:8080/auth/oauth/token
-            user-info-uri: http://localhost:8080/auth/user
+            authorization-uri: http://${vcap.application.uris[0]:localhost:${server.port}}/auth/oauth/authorize
+            token-uri: http://${vcap.application.uris[0]:localhost:${server.port}}/auth/oauth/token
+            user-info-uri: http://${vcap.application.uris[0]:localhost:${server.port}}/auth/user
             user-name-attribute: username
-            jwk-set-uri: http://localhost:8080/auth/.well-known/jwks.json
+            jwk-set-uri: http://${vcap.application.uris[0]:localhost:${server.port}}/auth/.well-known/jwks.json
 eureka:
   instance:
     instanceId: ${spring.application.name}:${random.value}
