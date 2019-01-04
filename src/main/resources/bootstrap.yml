@@ -25,7 +25,7 @@ spring:
         proto-append: false
       routes:
       - id: auth
-        uri: lb://auth
+        uri: lb:http://auth
         predicates:
         - Path=/auth/**
   profiles:
