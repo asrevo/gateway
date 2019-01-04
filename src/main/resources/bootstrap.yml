@@ -28,6 +28,10 @@ spring:
         uri: lb:http://auth
         predicates:
         - Path=/auth/**
+      - id: tube
+        uri: lb:http://tube
+        predicates:
+        - Path=/tube/**
   profiles:
     active: default,prod
   security:
