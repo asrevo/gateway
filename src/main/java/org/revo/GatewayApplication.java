@@ -73,7 +73,7 @@ public class GatewayApplication {
                 .and()
                 .logout()
                 .and().csrf().csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
-                .requireCsrfProtectionMatcher(ServerWebExchangeMatchers.pathMatchers("/auth"))
+//                .requireCsrfProtectionMatcher(ServerWebExchangeMatchers.pathMatchers("/auth"))
                 .and().build();
 //				.logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> httpServletResponse.setStatus(200))
 //				.logoutRequestMatcher(new AntPathRequestMatcher("/signout"))
