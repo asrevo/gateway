@@ -67,6 +67,7 @@ public class GatewayApplication {
         return http
                 .authorizeExchange()
                 .anyExchange().permitAll()
+                .and().formLogin()
                 .and()
                 .oauth2Login()
                 .and()
