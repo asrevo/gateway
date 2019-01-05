@@ -15,40 +15,8 @@ spring:
   cloud:
     config:
       uri: http://revo:revo@${org.revo.env.config.externalurl:${org.revo.env.config.internalurl}}
-    gateway:
-      routes:
-      - id: auth
-        uri: lb:http://auth
-        predicates:
-        - Path=/auth/**
-        filters:
-        - SaveSession
-      - id: tube
-        uri: lb:http://tube
-        predicates:
-        - Path=/tube/**
-        filters:
-        - StripPrefix=1
   profiles:
     active: default,prod
-  security:
-    oauth2:
-      client:
-        registration:
-          login-client:
-            provider: auth
-            client-id: revo
-            client-secret: revo
-            authorization-grant-type: authorization_code
-            redirect-uri-template: "{baseUrl}/login/oauth2/code/{registrationId}"
-            scope: read
-        provider:
-          auth:
-            authorization-uri: http://${vcap.application.uris[0]:localhost:${server.port}}/auth/oauth/authorize
-            token-uri: http://${vcap.application.uris[0]:localhost:${server.port}}/auth/oauth/token
-            user-info-uri: http://${vcap.application.uris[0]:localhost:${server.port}}/auth/user
-            user-name-attribute: username
-            jwk-set-uri: http://${vcap.application.uris[0]:localhost:${server.port}}/auth/.well-known/jwks.json
 eureka:
   instance:
     instanceId: ${spring.application.name}:${random.value}
