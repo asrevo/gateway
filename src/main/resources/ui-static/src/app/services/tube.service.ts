@@ -18,7 +18,7 @@ import {Master} from "../domain/master";
 
 @Injectable()
 export class TubeService {
-  private url = '/tube/api/';
+  private url = '/tube/api/master/';
 
 
   constructor(private _http: HttpClient,
