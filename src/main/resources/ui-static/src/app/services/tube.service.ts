@@ -30,7 +30,7 @@ export class TubeService {
   }
 
   findAllPagining(size: number, id: string): Observable<Master[]> {
-    return this._http.get<Master[]>(this.url + size + '/' + id)
+    return this._http.get<Master[]>(this.url + "master/" + size + '/' + id)
       .pipe(filter(it => it.length > 0), mergeMap((it: Master[]) => {
         return zip(this._userService.findAll(it.map(value => value.userId)),
           this._feedbackService.mediaInfoAll(it.map(value => value.id)),
