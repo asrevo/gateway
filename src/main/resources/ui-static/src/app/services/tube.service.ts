@@ -18,7 +18,7 @@ import {Master} from "../domain/master";
 
 @Injectable()
 export class TubeService {
-  private url = '/tube/api/master/';
+  private url = '/tube/api/';
 
 
   constructor(private _http: HttpClient,
@@ -47,7 +47,7 @@ export class TubeService {
   subscriptions(size: number, id: string): Observable<Master[]> {
     return this._feedbackService.followingTo(this._authService.getAuthUser().user.id)
       .pipe(filter((it: UserUserFollow[]) => it.length > 0), mergeMap((it: UserUserFollow[]) => {
-        return zip(this._http.post<Master[]>(this.url + size + '/' + id,
+        return zip(this._http.post<Master[]>(this.url + "master/" + size + '/' + id,
           new Ids(it.map(value => value.to))),
           this._userService.findAll(it.map(value => value.to)),
           (masters: Master[], users: User[]) => {
@@ -89,7 +89,7 @@ export class TubeService {
 
 
   findAllByIds(ids: string[]): Observable<Master[]> {
-    return this._http.post<Master[]>(this.url, new Ids(ids))
+    return this._http.post<Master[]>(this.url + "master/", new Ids(ids))
       .pipe(mergeMap((itms: Master[]) => {
         return this._userService.findAll(itms.map((itm: Master) => itm.userId))
           .pipe(map((itus: User[]) => {
@@ -103,7 +103,7 @@ export class TubeService {
   }
 
   findByUserId(itm: string): Observable<Master[]> {
-    return this._http.get<Master[]>(this.url + 'user/' + itm)
+    return this._http.get<Master[]>(this.url + "master/" + 'user/' + itm)
       .pipe(mergeMap((it: Master[]) => {
         return zip(this._userService.findAll(
           it.map(value => value.userId)),
@@ -119,7 +119,7 @@ export class TubeService {
   }
 
   findOne(it: string): Observable<Master> {
-    return this._http.get<Master>(this.url + 'one/' + it)
+    return this._http.get<Master>(this.url + "master/" + 'one/' + it)
       .pipe(mergeMap((itm: Master) => this._userService.findOne(itm.userId).pipe(map(itu => {
         itm.user = itu;
         return itm;
@@ -130,11 +130,11 @@ export class TubeService {
   }
 
   findGroup(master: string): Observable<MediaGroup> {
-    return this._http.get<MediaGroup>(this.url + "group/" + master)
+    return this._http.get<MediaGroup>(this.url + "master/" + "group/" + master)
   }
 
   findAllInGroup(id: string): Observable<Master[]> {
-    return this._http.get<Master[]>(this.url + "group/" + id + "/media")
+    return this._http.get<Master[]>(this.url + "master/" + "group/" + id + "/media")
       .pipe(mergeMap((it: Master[]) => {
         return zip(this._userService.findAll(
           it.map(value => value.userId)),
@@ -150,7 +150,7 @@ export class TubeService {
   }
 
   save(file: File): Observable<any> {
-    return this._http.post(this.url + "file/save", file);
+    return this._http.post(this.url + "file/" + "save", file);
   }
 
 
