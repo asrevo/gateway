@@ -5,6 +5,7 @@ import {HttpClient} from '@angular/common/http';
 import {mergeMap, tap} from 'rxjs/internal/operators';
 import {Observable, of} from 'rxjs';
 import {Ids} from '../domain/ids';
+import {map} from 'rxjs/operators';
 
 
 @Injectable()
@@ -17,7 +18,7 @@ export class UserService {
   }
 
   currentUser(): Observable<User> {
-    return this._http.get<User>(this.url + 'user');
+    return this._http.get(this.url + 'user').pipe(map(it => it["user"]));
   }
 
   findOne(id: string): Observable<User> {
