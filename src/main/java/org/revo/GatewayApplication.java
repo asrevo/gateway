@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
@@ -29,12 +30,11 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
-import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.util.pattern.PathPatternParser;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
+import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
@@ -47,8 +47,14 @@ public class GatewayApplication {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> indexRouter(@Value("classpath:/static/index.html") final Resource indexHtml) {
-        return route(GET("/"), request -> ok().contentType(MediaType.TEXT_HTML).syncBody(indexHtml));
+    public RouterFunction<ServerResponse> indexRouter(GatewayProperties gatewayProperties, @Value("classpath:/static/index.html") final Resource indexHtml) {
+        return route(serverRequest -> {
+            boolean gateway = gatewayProperties.getRoutes().stream()
+                    .flatMap(it -> it.getPredicates().stream())
+                    .filter(it -> it.getName().equalsIgnoreCase("Path"))
+                    .map(it -> it.getArgs().get("_genkey_0")).map(it -> new PathPatternParser().parse(it)).anyMatch(it -> it.matches(serverRequest.exchange().getRequest().getPath().pathWithinApplication()));
+            return !gateway && !serverRequest.path().contains(".");
+        }, request -> ok().contentType(MediaType.TEXT_HTML).syncBody(indexHtml));
     }
 
     @Bean
@@ -67,16 +73,10 @@ public class GatewayApplication {
         return http
                 .authorizeExchange()
                 .anyExchange().permitAll()
-                .and().formLogin()
-                .and()
-                .oauth2Login()
-                .and()
-                .logout()
+                .and().oauth2Login()
+                .and().logout()
                 .and().csrf().csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
-                .requireCsrfProtectionMatcher(ServerWebExchangeMatchers.pathMatchers("/auth"))
+                .requireCsrfProtectionMatcher(pathMatchers("/auth"))
                 .and().build();
-//				.logoutSuccessHandler((httpServletRequest, httpServletResponse, authentication) -> httpServletResponse.setStatus(200))
-//				.logoutRequestMatcher(new AntPathRequestMatcher("/signout"))
-//		.ignoringAntMatchers("/auth/**");
     }
 }
