@@ -73,7 +73,8 @@ public class GatewayApplication {
                     String name = "Set-Cookie";
                     String value = exchange.getResponse().getHeaders().getFirst(name);
                     if (!new PathPatternParser().parse("/auth/**").matches(exchange.getRequest().getPath().pathWithinApplication()) && value != null) {
-                        exchange.getResponse().getHeaders().set(name, value.replaceAll("SESSION=[0-9a-zA-Z]+; ", ""));
+                        log.info("old "+value+" new "+value.replaceAll("JSESSIONID=[0-9a-zA-Z]+; ", ""));
+                        exchange.getResponse().getHeaders().set(name, value.replaceAll("JSESSIONID=[0-9a-zA-Z]+; ", ""));
                     }
                 }));
     }
