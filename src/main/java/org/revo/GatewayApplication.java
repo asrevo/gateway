@@ -15,6 +15,7 @@
  */
 package org.revo;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,6 +42,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 
 @SpringBootApplication
 @EnableDiscoveryClient
+@Slf4j
 public class GatewayApplication {
 
     public static void main(String[] args) {
@@ -70,7 +72,11 @@ public class GatewayApplication {
                 .then(Mono.fromRunnable(() -> {
                     String name = "Set-Cookie";
                     String value = exchange.getResponse().getHeaders().getFirst(name);
-                    if (!new PathPatternParser().parse("/auth").matches(exchange.getRequest().getPath().pathWithinApplication()) && value != null) {
+                    boolean matches = new PathPatternParser().parse("/auth").matches(exchange.getRequest().getPath().pathWithinApplication());
+                    log.info(" path "+exchange.getRequest().getPath().pathWithinApplication().value());
+                    log.info(" path "+matches);
+
+                    if (!matches && value != null) {
                         exchange.getResponse().getHeaders().set(name, value.replaceAll("JSESSIONID=[0-9a-zA-Z]+; ", ""));
                     }
                 }));
