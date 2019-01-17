@@ -20,7 +20,7 @@ export class PlayerComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.player = new Clappr.Player({
-      source: "/tube/api/" + this.id + ".m3u8", parentId: "#player",
+      source: "/tube/api/master/" + this.id + ".m3u8", parentId: "#player",
       plugins: [Clappr.FlasHLS, LevelSelector, ClapprThumbnailsPlugin],
       height: 340,
       autoPlay: true,
