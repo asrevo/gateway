@@ -32,7 +32,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPatternParser;
 import reactor.core.publisher.Mono;
 
@@ -69,15 +68,12 @@ public class GatewayApplication {
                 .defaultIfEmpty(exchange)
                 .flatMap(chain::filter)
                 .then(Mono.fromRunnable(() -> {
-                    this.rewriteHeader(exchange, "Set-Cookie", "JSESSIONID=[0-9a-zA-Z]+; ", "");
+                    String name = "Set-Cookie";
+                    String value = exchange.getResponse().getHeaders().getFirst(name);
+                    if (!new PathPatternParser().parse("/auth").matches(exchange.getRequest().getPath().pathWithinApplication()) && value != null) {
+                        exchange.getResponse().getHeaders().set(name, value.replaceAll("JSESSIONID=[0-9a-zA-Z]+; ", ""));
+                    }
                 }));
-    }
-
-    protected void rewriteHeader(ServerWebExchange exchange, String name, String regexp, String replacement) {
-        String value = exchange.getResponse().getHeaders().getFirst(name);
-        if (value != null) {
-            exchange.getResponse().getHeaders().set(name, value.replaceAll(regexp, replacement.replace("$\\", "$")));
-        }
     }
 
     @Bean
