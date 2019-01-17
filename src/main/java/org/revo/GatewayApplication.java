@@ -32,7 +32,9 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPatternParser;
+import reactor.core.publisher.Mono;
 
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -65,7 +67,17 @@ public class GatewayApplication {
                 .map(OAuth2AuthorizedClient::getAccessToken)
                 .map(token -> exchange.mutate().request(r -> r.headers(headers -> headers.setBearerAuth(token.getTokenValue()))).build())
                 .defaultIfEmpty(exchange)
-                .flatMap(chain::filter);
+                .flatMap(chain::filter)
+                .then(Mono.fromRunnable(() -> {
+                    this.rewriteHeader(exchange, "Set-Cookie", "JSESSIONID=[0-9a-zA-Z]+; ", "");
+                }));
+    }
+
+    protected void rewriteHeader(ServerWebExchange exchange, String name, String regexp, String replacement) {
+        String value = exchange.getResponse().getHeaders().getFirst(name);
+        if (value != null) {
+            exchange.getResponse().getHeaders().set(name, value.replaceAll(regexp, replacement.replace("$\\", "$")));
+        }
     }
 
     @Bean
