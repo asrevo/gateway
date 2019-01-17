@@ -72,11 +72,7 @@ public class GatewayApplication {
                 .then(Mono.fromRunnable(() -> {
                     String name = "Set-Cookie";
                     String value = exchange.getResponse().getHeaders().getFirst(name);
-                    boolean matches = new PathPatternParser().parse("/auth").matches(exchange.getRequest().getPath().pathWithinApplication());
-                    log.info(" path "+exchange.getRequest().getPath().pathWithinApplication().value());
-                    log.info(" path "+matches);
-
-                    if (!matches && value != null) {
+                    if (!new PathPatternParser().parse("/auth/**").matches(exchange.getRequest().getPath().pathWithinApplication()) && value != null) {
                         exchange.getResponse().getHeaders().set(name, value.replaceAll("JSESSIONID=[0-9a-zA-Z]+; ", ""));
                     }
                 }));
